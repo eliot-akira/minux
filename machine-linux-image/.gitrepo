@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/ingydotnet/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/cartesi/machine-linux-image
+	branch = main
+	commit = 3b69acd0c353d081027d7dffc87f6e5853aef2d2
+	parent = 1d6480a9d0a78fd9e7d7cf562a3a25f7102a56ed
+	method = merge
+	cmdver = 0.4.6

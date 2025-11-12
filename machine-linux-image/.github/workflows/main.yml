@@ -1,0 +1,108 @@
+name: Build
+on: [push]
+permissions:
+  id-token: write
+  packages: write
+  contents: read
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Retrieve environment variables
+        run: make env >> $GITHUB_ENV
+
+      - name: Docker meta
+        id: docker_meta
+        uses: docker/metadata-action@v4
+        with:
+          images: |
+            ghcr.io/${{ github.repository_owner }}/linux-kernel
+            docker.io/${{ github.repository_owner }}/linux-kernel,enable=${{ github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/heads/release/') || startsWith(github.ref, 'refs/tags/v') }}
+          tags: |
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Download dependencies
+        run: make download
+
+      - name: Set up Depot CLI
+        uses: depot/setup-action@v1
+
+      - name: Build docker image
+        id: docker_build
+        uses: depot/build-push-action@v1
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          tags: cartesi/linux-kernel:devel
+          push: false
+          load: true
+          build-args: |
+            TOOLCHAIN_REPOSITORY=${{ env.TOOLCHAIN_REPOSITORY }}
+            TOOLCHAIN_VERSION=${{ env.TOOLCHAIN_VERSION }}
+            KERNEL_VERSION=${{ env.KERNEL_VERSION }}
+            KERNEL_TIMESTAMP=${{ env.KERNEL_TIMESTAMP }}
+            IMAGE_KERNEL_VERSION=${{ env.IMAGE_KERNEL_VERSION }}
+            OPENSBI_VERSION=${{ env.OPENSBI_VERSION }}
+          cache-from: type=gha,scope=regular
+          cache-to: type=gha,mode=max,scope=regular
+          project: ${{ vars.DEPOT_PROJECT }}
+
+      - name: Export linux.bin artifact
+        run: make copy
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          path: artifacts/*
+
+      - name: Checksum artifacts
+        shell: bash
+        run: |
+          for f in artifacts/*; do
+            sha512sum $f > $f.sha512
+          done
+
+      - uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/v')
+        with:
+          prerelease: true
+          files: |
+            artifacts/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.CI_TOKEN }}
+
+      - name: Push docker image
+        id: docker_push
+        uses: depot/build-push-action@v1
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          tags: ${{ steps.docker_meta.outputs.tags }}
+          push: true
+          load: false
+          build-args: |
+            TOOLCHAIN_REPOSITORY=${{ env.TOOLCHAIN_REPOSITORY }}
+            TOOLCHAIN_VERSION=${{ env.TOOLCHAIN_VERSION }}
+            KERNEL_VERSION=${{ env.KERNEL_VERSION }}
+            KERNEL_TIMESTAMP=${{ env.KERNEL_TIMESTAMP }}
+            IMAGE_KERNEL_VERSION=${{ env.IMAGE_KERNEL_VERSION }}
+            OPENSBI_VERSION=${{ env.OPENSBI_VERSION }}
+          cache-from: type=gha,scope=regular
+          cache-to: type=gha,mode=max,scope=regular
+          project: ${{ vars.DEPOT_PROJECT }}

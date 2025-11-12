@@ -1,0 +1,4 @@
+artifacts/*
+dep/*
+*.tar.gz
+cartesi-linux-config
