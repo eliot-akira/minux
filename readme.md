@@ -1,6 +1,6 @@
 # Minux
 
-Minimal Linux on WebAssembly based on Alpine on [Cartesi Machine](https://github.com/cartesi/machine-emulator) (RISC-V CPU).
+Minimal Linux on WebAssembly based on [Alpine](https://www.alpinelinux.org/) and [Cartesi Machine](https://github.com/cartesi/machine-emulator) (64-bit RISC-V CPU emulator).
 
 ![Minux screenshot](minux-screenshot.png)
 
