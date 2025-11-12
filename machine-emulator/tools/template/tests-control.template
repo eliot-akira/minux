@@ -1,0 +1,12 @@
+Package: cartesi-machine-tests
+Source: cartesi-machine-tests
+Version: ARG_VERSION
+Homepage: https://github.com/cartesi/machine-emulator
+Architecture: ARG_ARCH
+Maintainer: Cartesi Machine Reference Unit
+Provides: cartesi-machine-tests
+Depends: cartesi-machine-emulator (>= ARG_VERSION)
+Section: devel
+Priority: optional
+Multi-Arch: foreign
+Description: Cartesi Machine emulator tests

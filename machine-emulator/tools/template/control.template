@@ -1,0 +1,12 @@
+Package: cartesi-machine-emulator
+Source: cartesi-machine-emulator
+Version: ARG_VERSION
+Homepage: https://github.com/cartesi/machine-emulator
+Architecture: ARG_ARCH
+Maintainer: Cartesi Machine Reference Unit
+Provides: cartesi-machine-emulator
+Depends: lua5.4, libslirp0
+Section: devel
+Priority: optional
+Multi-Arch: foreign
+Description: Cartesi Machine emulator for RISC-V Linux systems

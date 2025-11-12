@@ -1,0 +1,11 @@
+*.ext2
+*.bin
+*.gcno
+*.gcov
+*.gcda
+*.profraw
+compile_flags.txt
+coverage*
+jsonrpc-discover.cpp
+machine-c-version.h
+interpret-jump-table.h

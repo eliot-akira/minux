@@ -1,0 +1,60 @@
+# retrieve machine cycles
+define cycles
+    monitor cycles
+end
+
+# step a fixed number of machine cycles
+define stepc
+    if $argc == 0
+        monitor stepc 1
+    end
+    if $argc == 1
+        monitor stepc $arg0
+    end
+    c
+    monitor stepc_clear
+    cycles
+end
+
+# step until until the machine reaches a cycle
+define stepu
+    monitor stepu $arg0
+    c
+    monitor stepc_clear
+    cycles
+end
+
+# print machine CSRs
+define csr
+    monitor csr $arg0
+end
+
+# print machine hash
+define hash
+    monitor hash
+end
+
+# store machine state
+define store
+    monitor store $arg0
+end
+
+# execute arbitrary lua code
+define lua
+    monitor lua $arg0
+end
+
+# toggle a hardware breakpoint at PC
+define breakpc
+    monitor breakpc $arg0
+end
+
+# dump registers (example on how to execute arbitrary Lua code)
+define dump_regs
+    lua "print('mcycle:', machine:read_mcycle()) return 'read the machine mcycle value in the machine terminal'"
+end
+
+# shortcuts
+alias sc=stepc
+alias su=stepu
+alias bpc=breakpc
