@@ -1,0 +1,19 @@
+Welcome to Minux, a virtual operating system on RISC-V machine.
+
+Networking supports HTTP/HTTPS requests, but is subject to CORS restrictions, therefore only endpoints that allow cross-origin requests will work.
+
+Currently there is no data persistence, or import/export.
+
+Examples:
+
+htop                    ncdu /
+df                      dmesg
+nvim                    vifm
+bc                      tmux
+cmatrix                 sqlite3
+lua hello.lua           tmux-hello-lua
+qjs hello.js            tmux-hello-js
+micropython hello.py    tmux-hello-py
+mruby hello.rb          tmux-hello-rb
+tcc -run hello.c        tmux-hello-c
+

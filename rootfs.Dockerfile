@@ -33,7 +33,7 @@ FROM --platform=linux/riscv64 toolchain-stage AS proxy-stage
 RUN apk add boost-dev openssl-dev
 COPY https-proxy https-proxy
 RUN make -C https-proxy
-RUN mkdir -p /pkg/usr/sbin /pkg/etc/ssl/webcm /pkg/etc/ssl/certs /pkg/usr/local/share/ca-certificates && \
+RUN mkdir -p /pkg/usr/sbin /pkg/etc/ssl/minux /pkg/etc/ssl/certs /pkg/usr/local/share/ca-certificates && \
     cp https-proxy/https-proxy /pkg/usr/sbin/https-proxy && \
     strip /pkg/usr/sbin/https-proxy
 

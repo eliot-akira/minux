@@ -24,15 +24,15 @@ cert_store::cert_store()
 }
 
 std::string cert_store::get_ca_dir() const {
-    return "/etc/ssl/webcm";
+    return "/etc/ssl/minux";
 }
 
 std::string cert_store::get_ca_cert_path() const {
-    return "/etc/ssl/webcm/mitm-ca.crt";
+    return "/etc/ssl/minux/mitm-ca.crt";
 }
 
 std::string cert_store::get_ca_key_path() const {
-    return "/etc/ssl/webcm/mitm-ca.key";
+    return "/etc/ssl/minux/mitm-ca.key";
 }
 
 bool cert_store::ensure_ca() {
@@ -245,7 +245,7 @@ void cert_store::install_ca_to_trust_store() {
     }
 
     std::string cert_path = get_ca_cert_path();
-    std::string trust_store_path = "/usr/local/share/ca-certificates/webcm-mitm-ca.crt";
+    std::string trust_store_path = "/usr/local/share/ca-certificates/minux-mitm-ca.crt";
     std::string cert_pem_path = "/etc/ssl/cert.pem";
 
     // Check if already installed and up to date
@@ -297,7 +297,7 @@ void cert_store::install_ca_to_trust_store() {
     std::string certs_dir = "/etc/ssl/certs";
     struct stat dir_stat;
     if (stat(certs_dir.c_str(), &dir_stat) == 0) {
-        std::string cert_link = certs_dir + "/webcm-mitm-ca.crt";
+        std::string cert_link = certs_dir + "/minux-mitm-ca.crt";
         unlink(cert_link.c_str()); // Remove existing link if any
         symlink(trust_store_path.c_str(), cert_link.c_str());
     }

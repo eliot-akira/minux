@@ -3,42 +3,17 @@
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>WebCM - Web Cartesi Machine</title>
+        <title>Minux</title>
         <meta
             name="description"
-            content="Linux RISC-V virtual machine, powered by the Cartesi Machine emulator, running in the browser via WebAssembly."
+            content="Linux RISC-V virtual machine"
         />
-        <meta
-            name="keywords"
-            context="WebCM, Cartesi Machine, Virtual Machine, Linux, RISC-V, Virtualization, WebAssembly, Emulator"
-        />
-        <meta property="og:title" content="WebCM - Web Cartesi Machine" />
-        <meta property="og:type" content="website" />
-        <meta property="og:site_name" content="WebCM" />
-        <meta
-            property="og:image"
-            content="https://edubart.github.io/webcm/social.png"
-        />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:site" content="@cartesiproject" />
-        <meta
-            name="twitter:title"
-            content="WebCM - Linux virtualization in WebAssembly"
-        />
-        <meta
-            name="twitter:description"
-            content="Linux RISC-V virtual machine, powered by the Cartesi Machine emulator, running in the browser via WebAssembly."
-        />
-        <meta
-            name="twitter:image"
-            content="https://edubart.github.io/webcm/social.png"
-        />
-        <link rel="preconnect" href="https://cdn.jsdelivr.net" />
-        <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+        <link rel="icon" href="web/favicon.svg" type="image/svg+xml" />
         <link
             rel="stylesheet"
-            href="https://cdn.jsdelivr.net/npm/@xterm/xterm@5.5.0/css/xterm.min.css"
+            href="web/xterm.min.css"
         />
+        <!-- https://cdn.jsdelivr.net/npm/@xterm/xterm@5.5.0/css/ -->
         <style>
             html {
                 height: 100%;
@@ -52,7 +27,7 @@
             #terminal {
                 height: 100%;
                 width: 100%;
-                padding: 4px;
+                padding: .5rem;
                 box-sizing: border-box;
             }
         </style>
@@ -61,18 +36,24 @@
         <div style="display: contents">
             <div id="terminal"></div>
         </div>
-        <script src="https://cdn.jsdelivr.net/npm/@xterm/xterm@5.5.0/lib/xterm.min.js"></script>
+        <!-- <script src="https://cdn.jsdelivr.net/npm/@xterm/xterm@5.5.0/lib/xterm.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/@xterm/addon-fit@0.10.0/lib/addon-fit.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/@xterm/addon-web-links@0.11.0/lib/addon-web-links.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@xterm/addon-web-links@0.11.0/lib/addon-web-links.min.js"></script> -->
+        <!-- Removed -->
         <!-- <script src="https://cdn.jsdelivr.net/npm/@xterm/addon-webgl@0.18.0/lib/addon-webgl.min.js"></script> -->
-        <script src="https://cdn.jsdelivr.net/npm/xterm-pty@0.11.1/index.min.js"></script>
+        <!-- <script src="https://cdn.jsdelivr.net/npm/xterm-pty@0.11.1/index.min.js"></script> -->
+        <script src="web/xterm.min.js"></script>
+        <script src="web/addon-fit.min.js"></script>
+        <script src="web/addon-web-links.min.js"></script>
+        <script src="web/xterm-pty.min.js"></script>
         <script type="module">
             // Create xterm.js terminal
             const terminalElem = document.getElementById("terminal");
             const xterm = new Terminal({
                 fontFamily: "monospace",
-                fontSize: 14,
+                fontSize: 18,
                 fontWeight: 400,
+                cursorBlink: true,
             });
             xterm.open(terminalElem);
             // xterm.loadAddon(new WebglAddon.WebglAddon());
@@ -103,8 +84,8 @@
             }).observe(terminalElem);
 
             // Download and initialize the emscripten module
-            xterm.write("Downloading...\n\r");
-            import initEmscripten from "./webcm.mjs";
+            xterm.write("Loading...\n\r");
+            import initEmscripten from "./minux.mjs";
             await initEmscripten({ pty: slave });
         </script>
     </body>

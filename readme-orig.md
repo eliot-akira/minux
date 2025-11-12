@@ -10,8 +10,6 @@ It's packaged as a single 32MiB WebAssembly file containing the emulator, the ke
 
 Networking supports HTTP/HTTPS requests, but is subject to CORS restrictions, therefore only endpoints that allow cross-origin requests will work.
 
-[![WebCM](social.png)](https://edubart.github.io/webcm/)
-
 Try it now by clicking on the image above.
 
 ## Building

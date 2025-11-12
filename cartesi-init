@@ -1,0 +1,83 @@
+#!/bin/busybox sh
+
+# disable terminal translation from nl to cr nl
+busybox stty -onlcr
+
+# mount
+[ ! -c /dev/zero ] && busybox mkdir -p /dev && busybox mount -o dev -t devtmpfs devtmpfs /dev
+busybox mkdir -p /proc /dev/pts /dev/shm /sys /tmp /run
+busybox mount -o nosuid,nodev,noexec          -t proc proc /proc
+busybox mount -o nosuid,noexec,mode=620,gid=5 -t devpts devpts /dev/pts
+busybox mount -o nosuid,nodev,mode=1777       -t tmpfs tmpfs /dev/shm
+busybox mount -o nosuid,nodev,noexec          -t sysfs sys /sys
+busybox mount -o nosuid,nodev,mode=1777       -t tmpfs tmpfs /tmp
+busybox mount -o nosuid,nodev,mode=0755       -t tmpfs tmpfs /run
+
+# system config
+[ -f /etc/sysctl.conf ] && busybox sysctl -pq
+
+# net
+[ -f /etc/hostname ] && busybox hostname -F /etc/hostname
+[ -z "$noloopback" ] && busybox ifconfig lo up
+
+# source environment
+[ -f /etc/environment ] && . /etc/environment
+export PATH
+
+# execute scripts in cartesi-init.d
+[ -d /etc/cartesi-init.d ] && for f in /etc/cartesi-init.d/*; do [ -x $f ] && . $f; done
+
+# execute init from device tree when available
+[ -f /proc/device-tree/cartesi-machine/init ] && . /proc/device-tree/cartesi-machine/init
+
+# use entrypoint from device tree when available, otherwise from command line
+if [ -s /proc/device-tree/cartesi-machine/entrypoint ]; then
+    ENTRYPOINT=". /proc/device-tree/cartesi-machine/entrypoint"
+elif [ -n "$*" ]; then
+    ENTRYPOINT="$*"
+fi
+
+# is entrypoint not empty?
+if [ -n "$ENTRYPOINT" ]; then
+    USER=${USER:-dapp}
+    HOME=$(eval echo ~$USER)
+    WORKDIR=${WORKDIR:-"$HOME"}
+
+    # give user group access to cmio device
+    [ -c /dev/cmio ] && \
+        busybox chown :$(busybox id -g $USER) /dev/cmio && \
+        busybox chmod g+rw /dev/cmio
+
+    # execute entrypoint
+    (cd $WORKDIR &&
+        USER=$USER LOGNAME=$USER HOME="$HOME" \
+        busybox setsid -c \
+        busybox su -p $USER -c "$ENTRYPOINT")
+else
+    echo "Nothing to do."
+fi
+RC=$?
+
+# shutdown
+busybox mount -o ro,remount /
+busybox umount -af
+if [ $RC != 0 ] && [ -x /usr/sbin/xhalt ]; then
+    /usr/sbin/xhalt "$RC"
+fi
+busybox poweroff -f
+
+# Copyright Cartesi and individual authors (see AUTHORS)
+# SPDX-License-Identifier: Apache-2.0
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#

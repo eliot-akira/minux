@@ -11,27 +11,27 @@ EMCC_CFLAGS=-Oz -g0 -std=gnu++23 \
 SKEL_FILES=$(shell find skel -type f)
 SRC_FILES=$(shell find https-proxy -type f -name '*.cpp' -o -name '*.hpp' -o -name Makefile)
 
-all: builder rootfs.ext2 webcm.mjs
+all: builder rootfs.ext2 minux.mjs
 
 test: # Test
 	emrun index.html
 
 builder: builder.Dockerfile ## Build WASM cross compiler docker image
-	docker build --tag webcm/builder --file $< --progress plain .
+	docker build --tag minux/builder --file $< --progress plain .
 
-webcm.wasm webcm.mjs: webcm.cpp rootfs.ext2.zz linux.bin.zz emscripten-pty.js
+minux.wasm minux.mjs: minux.cpp rootfs.ext2.zz linux.bin.zz emscripten-pty.js
 ifeq ($(IS_WASM_TOOLCHAIN),true)
-	em++ webcm.cpp -o webcm.mjs $(EMCC_CFLAGS)
+	em++ minux.cpp -o minux.mjs $(EMCC_CFLAGS)
 else
-	docker run --volume=.:/mnt --workdir=/mnt --user=$(shell id -u):$(shell id -g) --env=HOME=/tmp --rm -it webcm/builder make webcm.mjs
+	docker run --volume=.:/mnt --workdir=/mnt --user=$(shell id -u):$(shell id -g) --env=HOME=/tmp --rm -it minux/builder make minux.mjs
 endif
 
-gh-pages: index.html webcm.mjs webcm.wasm webcm.mjs favicon.svg
+gh-pages: index.html minux.mjs minux.wasm minux.mjs favicon.svg
 	mkdir -p $@
 	cp $^ $@/
 
 rootfs.ext2: rootfs.tar
-	xgenext2fs \
+	genext2fs \
 	    --faketime \
 	    --allow-holes \
 	    --size-in-blocks 65536 \
@@ -53,7 +53,7 @@ linux.bin: ## Download linux.bin
 	cat $< | pigz -cz -11 > $@
 
 clean: ## Remove built files
-	rm -f webcm.mjs webcm.wasm rootfs.tar rootfs.ext2 rootfs.ext2.zz linux.bin.zz
+	rm -f minux.mjs minux.wasm rootfs.tar rootfs.ext2 rootfs.ext2.zz linux.bin.zz
 
 distclean: clean ## Remove built files and downloaded files
 	rm -f linux.bin emscripten-pty.js
