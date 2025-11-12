@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/ingydotnet/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/cartesi/genext2fs
+	branch = cartesi
+	commit = 466d4aef70ba54b0ec79f2b1ebdd253d82bed06b
+	parent = ebf96a74e7fc57ee0586e11134895d24e6e368a5
+	method = merge
+	cmdver = 0.4.6
