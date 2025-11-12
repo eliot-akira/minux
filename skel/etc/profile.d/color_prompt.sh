@@ -6,12 +6,12 @@ _normal=$'\e[0m'
 #         _color=$'\e[1;32m'
 #         _symbol='$'
 # fi
-_color=$'\e[1;33m'
-_symbol='>'
+_color=$'\e[1;32m'
+_symbol='$'
 # if [ -n "$ZSH_VERSION" ]; then
 #         PS1="%{$_color%}%m [%{$_normal%}%~%{$_color%}]$_symbol %{$_normal%}"
 # else
         # PS1="\[$_color\]\h [\[$_normal\]\w\[$_color\]]$_symbol \[$_normal\]"
 # fi
-PS1="\[$_color\]\w\[$_normal\]> \[$_normal\]"
+PS1="\[$_color\]\w\[$_normal\]$_symbol \[$_normal\]"
 unset _normal _color _symbol
