@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/ingydotnet/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/cartesi/machine-emulator.wiki
+	branch = master
+	commit = a80dfcf1ef44a9dee2805f23a9bcb5e4bbdad2c7
+	parent = ca7bb842c935010ff55fb1a922a1259b3ace922c
+	method = merge
+	cmdver = 0.4.6
