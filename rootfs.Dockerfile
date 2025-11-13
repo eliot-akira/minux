@@ -82,6 +82,7 @@ RUN apk add \
     nano \
     make \
     curl \
+    git \
     # bc \
     # wget \
     tmux \
@@ -132,7 +133,7 @@ RUN apk add \
 # RUN ln -sf php82 /usr/bin/php
 
 # Remove unneeded files
-RUN rm -rf /var/cache/apk
+RUN rm -rf /var/cache/apk /usr/lib/libc.a
 # RUN apk del python3
 
 # Install init system and base skel
