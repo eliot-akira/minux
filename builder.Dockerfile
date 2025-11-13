@@ -4,10 +4,9 @@ RUN pacman -Syyu --noconfirm && \
     pacman -S --noconfirm git wget vim emscripten lua libslirp pigz
 
 # Build xgenext2fs
+COPY genext2fs genext2fs-1.5.6
 RUN <<EOF
 set -e
-wget -O genext2fs-1.5.6.tar.gz https://github.com/cartesi/genext2fs/archive/refs/tags/v1.5.6.tar.gz
-tar xzvf genext2fs-1.5.6.tar.gz
 cd genext2fs-1.5.6
 ./autogen.sh
 ./configure --prefix=/usr
@@ -15,7 +14,11 @@ make -j$(nproc)
 make install
 EOF
 
+# wget -O genext2fs-1.5.6.tar.gz https://github.com/cartesi/genext2fs/archive/refs/tags/v1.5.6.tar.gz
+# tar xzvf genext2fs-1.5.6.tar.gz
+
 # Download cartesi machine
+# COPY machine-emulator machine-emulator
 RUN <<EOF
 set -e
 git clone --branch v0.19.0 --depth 1 https://github.com/cartesi/machine-emulator.git
@@ -24,6 +27,8 @@ wget https://github.com/cartesi/machine-emulator/releases/download/v0.19.0/add-g
 patch -Np1 < add-generated-files.diff
 make bundle-boost
 EOF
+
+# cd machine-emulator
 
 # Build cartesi-machine and install in the system
 RUN <<EOF

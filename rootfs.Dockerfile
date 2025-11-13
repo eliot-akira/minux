@@ -22,7 +22,8 @@ WORKDIR /root
 # Build xhalt (tool used by init system to poweroff the machine)
 FROM --platform=linux/riscv64 toolchain-stage AS xhalt-stage
 RUN apk add libseccomp-dev
-RUN wget -O xhalt.c https://raw.githubusercontent.com/cartesi/machine-guest-tools/refs/tags/v0.17.2/sys-utils/xhalt/xhalt.c
+COPY xhalt.c xhalt.c
+# RUN wget -O xhalt.c https://raw.githubusercontent.com/cartesi/machine-guest-tools/refs/tags/v0.17.2/sys-utils/xhalt/xhalt.c
 RUN gcc xhalt.c -Os -s -o xhalt
 RUN mkdir -p /pkg/usr/sbin && \
     cp xhalt /pkg/usr/sbin/ && \
@@ -39,7 +40,15 @@ RUN mkdir -p /pkg/usr/sbin /pkg/etc/ssl/minux /pkg/etc/ssl/certs /pkg/usr/local/
 
 # Build gcompat (tool to run GLIBC programs)
 FROM --platform=linux/riscv64 toolchain-stage AS gcompat-stage
-RUN git clone --revision=d8cf7fbd072a379b9b16991539ba03bbbab4bd9c --depth=1 https://git.adelielinux.org/adelie/gcompat.git
+
+# Original
+# RUN git clone --revision=d8cf7fbd072a379b9b16991539ba03bbbab4bd9c --depth=1 https://git.adelielinux.org/adelie/gcompat.git
+
+# Local
+# git clone --depth=1 https://git.adelielinux.org/adelie/gcompat.git
+# cd gcompat
+# git reset --hard d8cf7fbd072a379b9b16991539ba03bbbab4bd9c
+COPY gcompat gcompat
 RUN <<EOF cat >> gcompat/gcompat.patch
 diff --git a/libgcompat/resolv.c b/libgcompat/resolv.c
 index c63d074..35fe616 100644
@@ -68,33 +77,69 @@ FROM --platform=linux/riscv64 alpine-base AS rootfs-stage
 
 # Install development utilities
 RUN apk add \
-    bash bash-completion \
-    neovim \
-    tree-sitter-lua tree-sitter-c tree-sitter-javascript tree-sitter-python tree-sitter-json tree-sitter-bash \
-    tmux \
-    htop ncdu vifm \
-    strace dmesg \
-    lua5.4 \
-    quickjs \
-    mruby \
-    jq \
-    bc \
-    sqlite \
-    micropython \
-    tcc tcc-libs tcc-libs-static tcc-dev musl-dev \
+    bash \
+    # bash-completion \
+    nano \
     make \
+    curl \
+    # bc \
+    # wget \
+    tmux \
+    # neovim \
+    htop \
+    ncdu \
     cmatrix \
-    curl wget \
+    # vifm \
+    # strace dmesg \
+    # libatomic \
+    \
+    # ~6MB
+    # tcc tcc-libs tcc-libs-static tcc-dev musl-dev \
+    quickjs \
+    sqlite \
+    # \
+    # wabt \
+    # wasmtime \
+    # \
+    # lua5.4 \
+    # micropython \
+    # mruby \
+    # esbuild \
+    \
+    # ~4M
+    # php82 \
+    \
+    # These are too big
+    # nodejs \
+    # npm \
+    # go \
+    # rust \
+    \
+    # Syntax highlight
+    # tree-sitter-c \
+    # tree-sitter-bash \
+    # tree-sitter-javascript tree-sitter-json \
+    # tree-sitter-lua \
+    # tree-sitter-python \
+    jq \
     dnsmasq \
-    libatomic
+  && apk add wabt wasmtime --repository=https://dl-cdn.alpinelinux.org/alpine/edge/testing
+  # /community
+
+# total 13~30M
+
+# RUN ln -sf lua5.4 /usr/bin/lua
+# RUN ln -sf php82 /usr/bin/php
 
 # Remove unneeded files
 RUN rm -rf /var/cache/apk
+# RUN apk del python3
 
 # Install init system and base skel
-ADD --chmod=755 https://raw.githubusercontent.com/cartesi/machine-guest-tools/refs/tags/v0.17.2/sys-utils/cartesi-init/cartesi-init /usr/sbin/cartesi-init
+COPY cartesi-init cartesi-init
+ADD --chmod=755 cartesi-init /usr/sbin/cartesi-init
+# ADD --chmod=755 https://raw.githubusercontent.com/cartesi/machine-guest-tools/refs/tags/v0.17.2/sys-utils/cartesi-init/cartesi-init /usr/sbin/cartesi-init
 COPY --from=xhalt-stage /pkg /
 COPY --from=proxy-stage /pkg /
 COPY --from=gcompat-stage /pkg /
 COPY skel /
-RUN ln -sf lua5.4 /usr/bin/lua

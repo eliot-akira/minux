@@ -1997,7 +1997,7 @@ if gdb_address then
     assert(address and port, "invalid address for GDB")
     gdb_stub:listen_and_wait_gdb(address, tonumber(port))
 end
-if config.processor.iunrep ~= 0 then stderr("Running in unreproducible mode!\n") end
+-- if config.processor.iunrep ~= 0 then stderr("Running in unreproducible mode!\n") end
 if cmio_advance or cmio_inspect then
     check_cmio_htif_config(config.htif)
     assert(remote_address or not perform_rollbacks, "cmio requires --remote-address for snapshot/commit/rollback")

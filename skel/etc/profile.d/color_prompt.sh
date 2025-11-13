@@ -13,5 +13,5 @@ _symbol='$'
 # else
         # PS1="\[$_color\]\h [\[$_normal\]\w\[$_color\]]$_symbol \[$_normal\]"
 # fi
-PS1="\[$_color\]\w\[$_normal\]$_symbol \[$_normal\]"
+PS1="\[$_color\]\w\[\e[2;37m\]$_symbol \[$_normal\]"
 unset _normal _color _symbol

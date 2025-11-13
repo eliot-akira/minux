@@ -7,3 +7,7 @@ emscripten-pty.js
 gh-pages
 *.wasm
 *.mjs
+/shared/*
+!/shared/.gitkeep
+/cartesi/*
+!/cartesi/.gitkeep

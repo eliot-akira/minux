@@ -59,13 +59,13 @@ distclean: clean ## Remove built files and downloaded files
 	rm -f linux.bin emscripten-pty.js
 
 shell: rootfs.ext2 linux.bin # For debugging
-	/usr/bin/cartesi-machine \
+	~/.local/bin/cartesi-machine \
 		--ram-image=linux.bin \
 		--flash-drive=label:root,filename:rootfs.ext2 \
 		--no-init-splash \
 		--network \
 		--user=root \
-		-it "exec ash -l"
+		-it "exec bash -l"
 
 serve: ## Serve a web server
 	python -m http.server 8080

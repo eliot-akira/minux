@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+main() {
+local scriptdir="$( dirname -- "$BASH_SOURCE" )"
+cd "$scriptdir" || exit
+./cartesi/bin/cartesi-machine \
+  --ram-image=linux.bin \
+  --flash-drive=label:root,filename:rootfs.ext2 \
+  --no-init-splash \
+  --network \
+  --user=root \
+  --volume=shared:/root/shared \
+  -it "exec bash -l"
+}
+main "$@"
