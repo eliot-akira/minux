@@ -1,92 +1,124 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>Minux</title>
-        <meta
-            name="description"
-            content="Linux RISC-V virtual machine"
-        />
-        <link rel="icon" href="web/favicon.svg" type="image/svg+xml" />
-        <link
-            rel="stylesheet"
-            href="web/xterm.min.css"
-        />
-        <!-- https://cdn.jsdelivr.net/npm/@xterm/xterm@5.5.0/css/ -->
-        <style>
-            html {
-                height: 100%;
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Minux</title>
+    <meta name="description" content="Linux RISC-V virtual machine" />
+    <link rel="icon" href="web/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="web/xterm.min.css" />
+    <style>
+      html {
+        height: 100%;
+      }
+      body {
+        margin: 0;
+        height: 100%;
+        background: #000;
+        overflow: hidden;
+      }
+      @font-face {
+        font-family: code-font;
+        src: url('web/monaspace-neon.woff');
+      }
+      #terminal {
+        height: 100%;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      .xterm {
+        padding: .5rem;
+      }
+      #terminal,
+      .xterm-helper-textarea {
+        font-family: code-font;
+        font-size: 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <div style="display: contents">
+      <div id="terminal"></div>
+    </div>
+    <script src="web/xterm.min.js"></script>
+    <script src="web/addon-fit.min.js"></script>
+    <script src="web/addon-web-links.min.js"></script>
+    <script src="web/xterm-pty.min.js"></script>
+    <script type="module">
+      import initEmscripten from './minux.mjs'
+
+      // Do not block page loading
+      // setTimeout(function () {
+      //   document.fonts.load('16px code-font').then(() => {
+          // Make font using elements visible
+          // document.documentElement.classList.add('font-loaded')
+      //     onLoaded()
+      //   })
+      // }, 0)
+      // async function onLoaded() {
+        // Create xterm.js terminal
+        const terminalElem = document.getElementById('terminal')
+        const xterm = new Terminal({
+          fontFamily: 'code-font',
+          fontSize: 16,
+          fontWeight: 400,
+          lineHeight: 1.26,
+          cursorBlink: true,
+        })
+        xterm.open(terminalElem)
+        // xterm.loadAddon(new WebglAddon.WebglAddon());
+        xterm.loadAddon(new WebLinksAddon.WebLinksAddon())
+        xterm.focus()
+
+        // Support copy & paste shortcuts
+        xterm.attachCustomKeyEventHandler(function (e) {
+          if (e.key === 'v' && e.ctrlKey) {
+            return false; // Let it work as paste
+          }
+          //  Ctrl + c for copy when selecting data, default otherwise
+          if (e.ctrlKey && e.code === "KeyC" && e.type === "keydown") {
+            const selection = xterm.getSelection();
+            if (selection) {
+              // copyText(selection);
+              document.execCommand("copy")
+              return false;
             }
-            body {
-                margin: 0;
-                height: 100%;
-                background: #000;
-                overflow: hidden;
-            }
-            #terminal {
-                height: 100%;
-                width: 100%;
-                padding: .5rem;
-                box-sizing: border-box;
-            }
-        </style>
-    </head>
-    <body>
-        <div style="display: contents">
-            <div id="terminal"></div>
-        </div>
-        <!-- <script src="https://cdn.jsdelivr.net/npm/@xterm/xterm@5.5.0/lib/xterm.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/@xterm/addon-fit@0.10.0/lib/addon-fit.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/@xterm/addon-web-links@0.11.0/lib/addon-web-links.min.js"></script> -->
-        <!-- Removed -->
-        <!-- <script src="https://cdn.jsdelivr.net/npm/@xterm/addon-webgl@0.18.0/lib/addon-webgl.min.js"></script> -->
-        <!-- <script src="https://cdn.jsdelivr.net/npm/xterm-pty@0.11.1/index.min.js"></script> -->
-        <script src="web/xterm.min.js"></script>
-        <script src="web/addon-fit.min.js"></script>
-        <script src="web/addon-web-links.min.js"></script>
-        <script src="web/xterm-pty.min.js"></script>
-        <script type="module">
-            // Create xterm.js terminal
-            const terminalElem = document.getElementById("terminal");
-            const xterm = new Terminal({
-                fontFamily: "monospace",
-                fontSize: 18,
-                fontWeight: 400,
-                cursorBlink: true,
-            });
-            xterm.open(terminalElem);
-            // xterm.loadAddon(new WebglAddon.WebglAddon());
-            xterm.loadAddon(new WebLinksAddon.WebLinksAddon());
-            xterm.focus();
+          }
+          // Ctrl + Shift + C
+          if (e.ctrlKey && e.shiftKey && (e.keyCode == 3)) {
+            var copySucceeded = document.execCommand('copy');
+            console.log('copy succeeded', copySucceeded);
+            return false;
+          }
+        });
 
-            // Create master/slave objects
-            const { master, slave } = openpty();
+        // Create master/slave objects
+        const { master, slave } = openpty()
 
-            // Configure terminal for raw mode
-            let termios = slave.ioctl("TCGETS");
-            termios.iflag &= ~0x5eb; // ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL | IXON)
-            termios.cflag &= ~0x130; // ~(CSIZE | PARENB)
-            termios.lflag &= ~0x804b; // ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN)
-            termios.cflag |= 0x30; // CS8
-            termios.oflag |= 0x1; // OPOST
-            slave.ioctl("TCSETS", termios);
+        // Configure terminal for raw mode
+        let termios = slave.ioctl('TCGETS')
+        termios.iflag &= ~0x5eb // ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL | IXON)
+        termios.cflag &= ~0x130 // ~(CSIZE | PARENB)
+        termios.lflag &= ~0x804b // ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN)
+        termios.cflag |= 0x30 // CS8
+        termios.oflag |= 0x1 // OPOST
+        slave.ioctl('TCSETS', termios)
 
-            // Connect the master object to xterm.js
-            xterm.loadAddon(master);
+        // Connect the master object to xterm.js
+        xterm.loadAddon(master)
 
-            // Make the terminal's size and geometry fit the size of #terminal
-            const fitAddon = new FitAddon.FitAddon();
-            xterm.loadAddon(fitAddon);
-            fitAddon.fit();
-            new ResizeObserver(function () {
-                fitAddon.fit();
-            }).observe(terminalElem);
+        // Make the terminal's size and geometry fit the size of #terminal
+        const fitAddon = new FitAddon.FitAddon()
+        xterm.loadAddon(fitAddon)
+        fitAddon.fit()
+        new ResizeObserver(function () {
+          fitAddon.fit()
+        }).observe(terminalElem)
 
-            // Download and initialize the emscripten module
-            xterm.write("Loading...\n\r");
-            import initEmscripten from "./minux.mjs";
-            await initEmscripten({ pty: slave });
-        </script>
-    </body>
+        // Download and initialize the emscripten module
+        xterm.write('Loading...\n\r')
+        await initEmscripten({ pty: slave })
+      // }
+    </script>
+  </body>
 </html>
