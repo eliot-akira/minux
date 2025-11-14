@@ -1,6 +1,6 @@
 ################################
 # Toolchain stage
-FROM --platform=linux/riscv64 alpine:3.22.2@sha256:4b7ce07002c69e8f3d704a9c5d6fd3053be500b7f1c69fc0d80990c2ad8dd412 AS alpine-base
+FROM alpine:3.22.2@sha256:4b7ce07002c69e8f3d704a9c5d6fd3053be500b7f1c69fc0d80990c2ad8dd412 AS alpine-base
 
 # Update system
 RUN apk update && \
@@ -8,7 +8,7 @@ RUN apk update && \
 
 ################################
 # Toolchain stage
-FROM --platform=linux/riscv64 alpine-base AS toolchain-stage
+FROM alpine-base AS toolchain-stage
 
 # Update and install development packages
 RUN apk add build-base pkgconf git wget patchelf
@@ -20,7 +20,7 @@ WORKDIR /root
 # Build tools
 
 # Build xhalt (tool used by init system to poweroff the machine)
-FROM --platform=linux/riscv64 toolchain-stage AS xhalt-stage
+FROM toolchain-stage AS xhalt-stage
 RUN apk add libseccomp-dev
 COPY xhalt.c xhalt.c
 # RUN wget -O xhalt.c https://raw.githubusercontent.com/cartesi/machine-guest-tools/refs/tags/v0.17.2/sys-utils/xhalt/xhalt.c
@@ -30,7 +30,7 @@ RUN mkdir -p /pkg/usr/sbin && \
     strip /pkg/usr/sbin/xhalt
 
 # Build https-proxy (proxy used to provide networking in the browser)
-FROM --platform=linux/riscv64 toolchain-stage AS proxy-stage
+FROM toolchain-stage AS proxy-stage
 RUN apk add boost-dev openssl-dev
 COPY https-proxy https-proxy
 RUN make -C https-proxy
@@ -39,7 +39,7 @@ RUN mkdir -p /pkg/usr/sbin /pkg/etc/ssl/minux /pkg/etc/ssl/certs /pkg/usr/local/
     strip /pkg/usr/sbin/https-proxy
 
 # Build gcompat (tool to run GLIBC programs)
-FROM --platform=linux/riscv64 toolchain-stage AS gcompat-stage
+FROM toolchain-stage AS gcompat-stage
 
 # Original
 # RUN git clone --revision=d8cf7fbd072a379b9b16991539ba03bbbab4bd9c --depth=1 https://git.adelielinux.org/adelie/gcompat.git
@@ -73,24 +73,27 @@ RUN make -C gcompat install LINKER_PATH=/lib/ld-musl-riscv64.so.1 LOADER_NAME=ld
 
 ################################
 # Download packages
-FROM --platform=linux/riscv64 alpine-base AS rootfs-stage
+FROM alpine-base AS rootfs-stage
 
 # Install development utilities
 RUN apk add \
+    git \
+    cmatrix \
+    curl wget \
+    libatomic \
+    \
+    make \
+    nano \
+    tmux \
+    jq \
+    dnsmasq \
     # +2
     # bash \
     # \
     # bash-completion \
-    make \
-    nano \
-    curl \
-    tmux \
-    jq \
-    dnsmasq \
     # file \
     # htop \
     # ncdu \
-    # cmatrix \
     \
     # +7
     # neovim \
@@ -151,6 +154,9 @@ RUN apk add \
   # && apk add clojure --repository=https://dl-cdn.alpinelinux.org/alpine/edge/community
   ;
 
+# Remove unneeded files to shrink image size
+RUN rm -rf /var/cache/apk /usr/lib/libc.a
+
 # Install init system and base skel
 COPY cartesi-init cartesi-init
 ADD --chmod=755 cartesi-init /usr/sbin/cartesi-init
@@ -161,7 +167,4 @@ COPY --from=gcompat-stage /pkg /
 COPY skel /
 
 # Remove unneeded files
-RUN rm cartesi-init \
-  && rm -rf /var/cache/apk \
-  && rm -f /usr/lib/libc.a
-  # apk del python3
+RUN rm cartesi-init
