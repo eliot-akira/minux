@@ -1,0 +1,24 @@
+link() { echo -e '\e[2;37m\e[4m' ; }
+red() { echo -e '\e[1;31m' ; }
+green() { echo -e '\e[1;32m' ; }
+yellow() { echo -e '\e[1;33m' ; }
+blue() { echo -e '\e[1;34m' ; }
+white() { echo -e '\e[1;37m' ; }
+grey() { echo -e '\e[2;37m' ; }
+reset() { echo -e '\e[0m' ; }
+cat <<EOF
+⠀⢀⠤⡀⡀⣴⣶⣤⣶⣦⠀
+⠀⢸⠀⠀⠀⠻⠿⠛⠿⠟⠀
+⢐⣺⠀⡄⠀⠀⠀⢠⠀⣗⡂
+⠀⠘⢄⡀⠀⠛⠀⢀⡠⠃⠀
+
+$(yellow)${USER}@$(cat /etc/hostname)$(reset)
+$(blue)os$(reset)    Alpine $(cat /etc/alpine-release)
+$(blue)linux$(reset) $(uname -r)
+$(blue)mem$(reset)   $(free -m | awk '/Mem:/ { printf "%dMiB / %dMiB\n", $3, $2 }')
+$(blue)disk$(reset)  $(df -m / | awk 'NR==2 {printf "%dMiB / %dMiB\n", $3, $2}')
+$(blue)arch$(reset)  $(uname -m)
+$(blue)isa$(reset)   $(grep -o "rv.*" /proc/cpuinfo)
+$(blue)shell$(reset) $0
+$(blue)src$(reset)   $(link)https://github.com/eliot-akira/minux$(reset)
+EOF

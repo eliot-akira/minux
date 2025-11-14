@@ -13,12 +13,7 @@ Build machine.
 ```sh
 cd machine-emulator
 make install PREFIX="$(realpath ../cartesi)"
-```
-
-Run machine.
-
-```sh
-./run
+cd ..
 ```
 
 Builld operating system as WebAssembly binary.
@@ -27,4 +22,8 @@ Builld operating system as WebAssembly binary.
 make
 ```
 
+Run machine.
 
+```sh
+./run
+```

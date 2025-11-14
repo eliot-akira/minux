@@ -264,7 +264,7 @@ int main() {
         "dtb": {
             "bootargs": "quiet earlycon=sbi console=hvc1 root=/dev/pmem0 rw init=/usr/sbin/cartesi-init",
             "init": "date -s @%llu >> /dev/null && dnsmasq --address=/#/127.0.0.1 --local=/#/ --no-resolv && https-proxy 127.0.0.1 80 443 > /dev/null 2>&1 &",
-            "entrypoint": "exec bash -l"
+            "entrypoint": "export TERM=xterm-256color; exec ash -l"
         },
         "ram": {"length": %llu},
         "flash_drive": [

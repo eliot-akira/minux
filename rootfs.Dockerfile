@@ -77,64 +77,79 @@ FROM --platform=linux/riscv64 alpine-base AS rootfs-stage
 
 # Install development utilities
 RUN apk add \
-    bash \
+    # +2
+    # bash \
+    # \
     # bash-completion \
-    nano \
     make \
+    nano \
     curl \
-    git \
-    # bc \
-    # wget \
     tmux \
-    # neovim \
-    htop \
-    ncdu \
-    cmatrix \
-    # vifm \
-    # strace dmesg \
-    # libatomic \
+    jq \
+    dnsmasq \
+    # file \
+    # htop \
+    # ncdu \
+    # cmatrix \
     \
-    # ~6MB
-    # tcc tcc-libs tcc-libs-static tcc-dev musl-dev \
+    # +7
+    # neovim \
+    # vifm \
+    \
+    # strace \
+    # dmesg \
+    # libatomic \
+    # bc \
+    \
+    # Already installed:
+    # git wget \
+    tcc tcc-libs-static musl-dev \
+    tcc-libs  tcc-dev \
+    lua5.4 \
+    micropython \
+    \
+    # +2
     quickjs \
     sqlite \
+    # +1
+    quickjs-dev \
+    sqlite-dev \
     # \
-    # wabt \
-    # wasmtime \
-    # \
-    # lua5.4 \
-    # micropython \
+    # +1
     # mruby \
+    # guile \
+    # ecl \
     # esbuild \
-    \
-    # ~4M
-    # php82 \
-    \
-    # These are too big
+    # \
     # nodejs \
     # npm \
     # go \
     # rust \
-    \
+    # \
     # Syntax highlight
     # tree-sitter-c \
     # tree-sitter-bash \
     # tree-sitter-javascript tree-sitter-json \
     # tree-sitter-lua \
     # tree-sitter-python \
-    jq \
-    dnsmasq \
-  && apk add wabt wasmtime --repository=https://dl-cdn.alpinelinux.org/alpine/edge/testing
-  # /community
-
-# total 13~30M
-
-# RUN ln -sf lua5.4 /usr/bin/lua
-# RUN ln -sf php82 /usr/bin/php
-
-# Remove unneeded files
-RUN rm -rf /var/cache/apk /usr/lib/libc.a
-# RUN apk del python3
+    # tree-sitter-scheme \
+  && ln -sf lua5.4 /usr/bin/lua \
+  # +3
+  # && apk add php82 \
+  # && apk add php82-pdo_sqlite --repository=https://dl-cdn.alpinelinux.org/alpine/edge/testing \
+  # && ln -sf php82 /usr/bin/php
+  # +13M
+  # && apk add wasmtime --repository=https://dl-cdn.alpinelinux.org/alpine/edge/testing \
+  # && apk add wabt --repository=https://dl-cdn.alpinelinux.org/alpine/edge/testing \
+  # && apk add wasm-tools --repository=https://dl-cdn.alpinelinux.org/alpine/edge/community \
+  \
+  # 4MB
+  # && apk add ecl --repository=https://dl-cdn.alpinelinux.org/alpine/edge/main \
+  \
+  # && apk add clang21 --repository=https://dl-cdn.alpinelinux.org/alpine/edge/main \
+  # && apk add emacs --repository=https://dl-cdn.alpinelinux.org/alpine/edge/community \
+  # && apk add clojure --repository=https://dl-cdn.alpinelinux.org/alpine/edge/community
+  ;
 
 # Install init system and base skel
 COPY cartesi-init cartesi-init
@@ -144,3 +159,9 @@ COPY --from=xhalt-stage /pkg /
 COPY --from=proxy-stage /pkg /
 COPY --from=gcompat-stage /pkg /
 COPY skel /
+
+# Remove unneeded files
+RUN rm cartesi-init \
+  && rm -rf /var/cache/apk \
+  && rm -f /usr/lib/libc.a
+  # apk del python3

@@ -1,23 +1,15 @@
 
 Welcome to Minux, a cozy operating system on a RISC-V virtual machine.
 
-There is no data persistence currently, or import/export. Networking with
-HTTP/HTTPS works for endpoints that allow cross-origin requests (CORS).
-
-Example commands:
-
-htop                    ncdu /
-df                      dmesg
-bc                      tmux
-cmatrix                 sqlite3
-apk add gcc             curl ifconfig.me/ip
-
 Languages:
 
-bash apk-list.sh
-tcc -run hello.c
-qjs hello.js
-lua hello.lua
-micropython hello.py
-mruby hello.rb
-wasmtime hello.wasm
+tcc -run hello.c   qjs hello.js
+lua hello.lua      micropython hello.py
+ash hello.sh       cat hello.txt
+
+See available commands:
+
+ls /bin            ls /usr/bin
+
+There is no networking, data persistence or import/export currently.
+

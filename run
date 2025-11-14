@@ -9,6 +9,6 @@ cd "$scriptdir" || exit
   --network \
   --user=root \
   --volume=shared:/root/shared \
-  -it "exec bash -l"
+  -it "exec ash -l"
 }
 main "$@"
