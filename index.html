@@ -48,14 +48,14 @@
       import initEmscripten from './minux.mjs'
 
       // Do not block page loading
-      // setTimeout(function () {
-      //   document.fonts.load('16px code-font').then(() => {
+      setTimeout(function () {
+        document.fonts.load('16px code-font').then(() => {
           // Make font using elements visible
           // document.documentElement.classList.add('font-loaded')
-      //     onLoaded()
-      //   })
-      // }, 0)
-      // async function onLoaded() {
+          onLoaded()
+        })
+      }, 0)
+      async function onLoaded() {
         // Create xterm.js terminal
         const terminalElem = document.getElementById('terminal')
         const xterm = new Terminal({
@@ -118,7 +118,7 @@
         // Download and initialize the emscripten module
         xterm.write('Loading...\n\r')
         await initEmscripten({ pty: slave })
-      // }
+      }
     </script>
   </body>
 </html>
