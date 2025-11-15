@@ -47,6 +47,20 @@
     <script type="module">
       import initEmscripten from './minux.mjs'
 
+      // Create master/slave objects
+      const { master, slave } = openpty()
+
+      // Configure terminal for raw mode
+      let termios = slave.ioctl('TCGETS')
+      termios.iflag &= ~0x5eb // ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL | IXON)
+      termios.cflag &= ~0x130 // ~(CSIZE | PARENB)
+      termios.lflag &= ~0x804b // ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN)
+      termios.cflag |= 0x30 // CS8
+      termios.oflag |= 0x1 // OPOST
+      slave.ioctl('TCSETS', termios)
+
+      const emPromise = initEmscripten({ pty: slave })
+
       // Do not block page loading
       setTimeout(function () {
         document.fonts.load('16px code-font').then(() => {
@@ -55,6 +69,7 @@
           onLoaded()
         })
       }, 0)
+
       async function onLoaded() {
         // Create xterm.js terminal
         const terminalElem = document.getElementById('terminal')
@@ -92,18 +107,6 @@
           }
         });
 
-        // Create master/slave objects
-        const { master, slave } = openpty()
-
-        // Configure terminal for raw mode
-        let termios = slave.ioctl('TCGETS')
-        termios.iflag &= ~0x5eb // ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL | IXON)
-        termios.cflag &= ~0x130 // ~(CSIZE | PARENB)
-        termios.lflag &= ~0x804b // ~(ECHO | ECHONL | ICANON | ISIG | IEXTEN)
-        termios.cflag |= 0x30 // CS8
-        termios.oflag |= 0x1 // OPOST
-        slave.ioctl('TCSETS', termios)
-
         // Connect the master object to xterm.js
         xterm.loadAddon(master)
 
@@ -117,7 +120,8 @@
 
         // Download and initialize the emscripten module
         xterm.write('Loading...\n\r')
-        await initEmscripten({ pty: slave })
+
+        await emPromise
       }
     </script>
   </body>
