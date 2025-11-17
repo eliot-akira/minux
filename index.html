@@ -45,9 +45,9 @@
     <script src="web/addon-web-links.min.js"></script>
     <script src="web/xterm-pty.min.js"></script>
     <script type="module">
-      import initEmscripten from './minux.mjs'
+      import createMachine from './minux.mjs'
 
-      // Create master/slave objects
+      // Pseudo-terminal
       const { master, slave } = openpty()
 
       // Configure terminal for raw mode
@@ -59,14 +59,29 @@
       termios.oflag |= 0x1 // OPOST
       slave.ioctl('TCSETS', termios)
 
-      const emPromise = initEmscripten({ pty: slave })
+      let machine = createMachine({
+        pty: slave,
+        onRuntimeInitialized() {
+          (async () => {
+          machine = window.vm = await machine
+          const { FS } = machine
+          if (!FS) { return console.error('FS not found')}
+          const dir = `/home/web_user/shared`
+          FS.mkdir(dir);
+          FS.mount(FS.filesystems.IDBFS, {
+            autoPersist: true
+          }, dir);
+           FS.syncfs(true)
+          })().catch(console.error)
+        }
+      })
 
       // Do not block page loading
       setTimeout(function () {
         document.fonts.load('16px code-font').then(() => {
           // Make font using elements visible
           // document.documentElement.classList.add('font-loaded')
-          onLoaded()
+          onLoaded().catch(console.error)
         })
       }, 0)
 
@@ -121,7 +136,7 @@
         // Download and initialize the emscripten module
         xterm.write('Loading...\n\r')
 
-        await emPromise
+        machine = await machine
       }
     </script>
   </body>
