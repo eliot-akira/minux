@@ -10,6 +10,7 @@ gh-pages
 .cache
 .buildx-cache
 .webcm-builder
+.minux-builder
 /shared/*
 !/shared/.gitkeep
 /cartesi/*

@@ -77,10 +77,11 @@ FROM alpine-base AS rootfs-stage
 
 # Install development utilities
 RUN apk add \
-    git \
-    cmatrix \
-    curl wget \
-    libatomic \
+    # git \
+    curl \
+    # wget \
+    # libatomic \
+    # cmatrix \
     \
     make \
     nano \
@@ -140,9 +141,10 @@ RUN apk add \
   # +3
   # && apk add php82 \
   # && apk add php82-pdo_sqlite --repository=https://dl-cdn.alpinelinux.org/alpine/edge/testing \
-  # && ln -sf php82 /usr/bin/php
-  # +13M
+  # && ln -sf php82 /usr/bin/php \
+  # +7M
   # && apk add wasmtime --repository=https://dl-cdn.alpinelinux.org/alpine/edge/testing \
+  # +6
   # && apk add wabt --repository=https://dl-cdn.alpinelinux.org/alpine/edge/testing \
   # && apk add wasm-tools --repository=https://dl-cdn.alpinelinux.org/alpine/edge/community \
   \

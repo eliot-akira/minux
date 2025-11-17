@@ -1,15 +1,12 @@
 
-Welcome to Minux, a cozy operating system on a RISC-V virtual machine.
+Welcome to Minux, a cozy operating system on 64-bit RISC-V virtual machine.
 
-Languages:
+Examples:
 
 tcc -run hello.c   qjs hello.js
 lua hello.lua      micropython hello.py
 ash hello.sh       cat hello.txt
-
-See available commands:
-
 ls /bin            ls /usr/bin
 
-There is no networking, data persistence or import/export currently.
+The home folder ~/ is stored in browser. No networking or import/export yet.
 

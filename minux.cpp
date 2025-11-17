@@ -263,15 +263,16 @@ int main() {
     snprintf(config, sizeof(config), R"({
         "dtb": {
             "bootargs": "quiet earlycon=sbi console=hvc1 root=/dev/pmem0 rw init=/usr/sbin/cartesi-init",
-            "init": "date -s @%llu >> /dev/null && https-proxy 127.254.254.254 80 443 > /dev/null 2>&1 &",
-            "entrypoint": "export TERM=xterm-256color; exec ash -l"
+            "init": "date -s @%llu >> /dev/null && mkdir -p /host && mount -t 9p vfs1 /host; https-proxy 127.254.254.254 80 443 > /dev/null 2>&1 &",
+            "entrypoint": "if [ -d /host/shared ]; then if [ ! -f /host/shared/.profile ]; then cd /root; for f in * .profile; do if [ ! -f /host/shared/$f ]; then cp $f /host/shared/$f; fi; done; fi; mv /root /root-src; ln -s /host/shared /root; fi; cd /root; if [ -f /root/init.sh ]; then ash /root/init.sh || true; fi; exec ash -l"
         },
         "ram": {"length": %llu},
         "flash_drive": [
             {"length": %llu}
         ],
         "virtio": [
-            {"type": "console"}
+            {"type": "console"},
+            {"type": "p9fs", "tag": "vfs1", "host_directory": "/home/web_user"}
         ],
         "processor": {
             "iunrep": 1

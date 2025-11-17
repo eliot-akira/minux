@@ -6,9 +6,10 @@ EMCC_CFLAGS=-Oz -g0 -std=gnu++23 \
     -Wall -Wextra -Wno-unused-function -Wno-c23-extensions \
     -sASYNCIFY \
     -sFETCH \
+		-lidbfs.js \
    	-sSTACK_SIZE=4MB \
    	-sTOTAL_MEMORY=768MB \
-   	-sEXPORTED_RUNTIME_METHODS=ccall,cwrap,UTF8ToString,stringToUTF8
+   	-sEXPORTED_RUNTIME_METHODS=ccall,cwrap,UTF8ToString,stringToUTF8,FS
 PIGZ_LEVEL ?= 11
 GUEST_SKEL_FILES=$(shell find skel -type f)
 GUEST_SRC_FILES=$(shell find https-proxy -type f -name '*.cpp' -o -name '*.hpp' -o -name Makefile)
