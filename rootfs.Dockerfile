@@ -88,6 +88,8 @@ RUN apk add \
     tmux \
     jq \
     dnsmasq \
+    ncurses-dev \
+    mandoc \
     # +2
     # bash \
     # \

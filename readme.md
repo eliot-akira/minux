@@ -27,3 +27,10 @@ Run machine.
 ```sh
 ./run
 ```
+
+## References
+
+- [Web Cartesi Machine](https://github.com/edubart/webcm)
+- [Cartesi Machine Emulator Wiki](https://github.com/cartesi/machine-emulator)
+- Image builders for [Linux Kernel](https://github.com/cartesi/machine-linux-image) and [RootFS](https://github.com/cartesi/machine-rootfs-image)
+- [The Core of Cartesi](https://w3.impa.br/~diego/publications/TexNeh18.pdf) (PDF)

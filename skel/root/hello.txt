@@ -1,5 +1,6 @@
 
 Welcome to Minux, a cozy operating system on 64-bit RISC-V virtual machine.
+The home folder ~/ is stored in browser. No networking or import/export yet.
 
 Examples:
 
@@ -7,6 +8,4 @@ tcc -run hello.c   qjs hello.js
 lua hello.lua      micropython hello.py
 ash hello.sh       cat hello.txt
 ls /bin            ls /usr/bin
-
-The home folder ~/ is stored in browser. No networking or import/export yet.
 
